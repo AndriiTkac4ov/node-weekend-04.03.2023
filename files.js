@@ -51,25 +51,27 @@ const getFiles = () => {
 
 const getFile = (file) => {
     fsPromises.readdir(path.join(__dirname, './files'))
-        .then(data => {
-            if (!data.includes(file)) {
+        .then(files => {
+            if (!files.includes(file)) {
                 console.log(chalk.red(`The file with name "${file}" is not found`));
 
                 return;
             }
 
             fsPromises.readFile(path.join(__dirname, './files', file), 'utf-8')
-                .then(text => {
-                    fsPromises.stat(path.join(__dirname, './files', file)).then(data => 
-                        console.log({
-                            message: "Success",
-                            fileName: file,
-                            content: text,
-                            extention: checkExtention(file).extention,
-                            size: data.size,
-                            data: data.birthtime.toLocaleTimeString(),
-                        })
-                    );
+                .then(content => {
+                    fsPromises.stat(path.join(__dirname, './files', file))
+                        .then(data => 
+                            console.log({
+                                message: "Success",
+                                fileName: file,
+                                content,
+                                extention: checkExtention(file).extention,
+                                fileSize: data.size,
+                                data: data.birthtime.toString(),
+                            })
+                        )
+                        .catch(console.log);
                 });
         })
         .catch(error => console.log(error));
