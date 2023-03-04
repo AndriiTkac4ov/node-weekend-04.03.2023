@@ -27,11 +27,56 @@ const createFile = (fileName, content) => {
         return;
     }
 
-    fsPromises.writeFile(path.join(__dirname, './files', fileName), content, 'utf-8');
+    fsPromises.writeFile(path.join(__dirname, './files', fileName), content, 'utf-8')
+        .then(() =>
+            console.log(chalk.green('File created success!')))
+        .catch(error => console.log(error));
 
-    console.log(chalk.green('File corrected success!'));
-}
+    ;
+};
+
+const getFiles = () => {
+    fsPromises.readdir(path.join(__dirname, './files'))
+        .then(data => {
+            if (!data.length) {
+                console.log(chalk.red('There are no files in this directory'));
+
+                return;
+            }
+
+            data.forEach(file => console.log(chalk.blueBright(file)))
+        })
+        .catch(error => console.log(error));
+};
+
+const getFile = (file) => {
+    fsPromises.readdir(path.join(__dirname, './files'))
+        .then(data => {
+            if (!data.includes(file)) {
+                console.log(chalk.red(`The file with name "${file}" is not found`));
+
+                return;
+            }
+
+            fsPromises.readFile(path.join(__dirname, './files', file), 'utf-8')
+                .then(text => {
+                    fsPromises.stat(path.join(__dirname, './files', file)).then(data => 
+                        console.log({
+                            message: "Success",
+                            fileName: file,
+                            content: text,
+                            extention: checkExtention(file).extention,
+                            size: data.size,
+                            data: data.birthtime.toLocaleTimeString(),
+                        })
+                    );
+                });
+        })
+        .catch(error => console.log(error));
+};
 
 module.exports = {
     createFile,
-}
+    getFiles,
+    getFile,
+};
